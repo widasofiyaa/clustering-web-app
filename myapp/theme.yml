@@ -1,0 +1,12 @@
+attrs:
+  Figure:
+    #width: 600
+    height: 600
+    background_fill_color: 'lightgrey'
+    background_fill_alpha: 0.2
+
+  Grid:
+    grid_line_color: null
+
+  Title:
+    text_font_size: '13px'
