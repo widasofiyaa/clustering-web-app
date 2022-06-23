@@ -4,14 +4,26 @@ from sklearn.neighbors import kneighbors_graph
 from sklearn.preprocessing import StandardScaler
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, Select, Slider
+from bokeh.models import ColumnDataSource, Select, Slider, Div
 from bokeh.palettes import Spectral6
 from bokeh.plotting import figure
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
+from os.path import dirname, join
+
+from bokeh.themes import Theme, built_in_themes
+
+def switch_theme(value, old, new):
+    curdoc().theme = new
+
 np.random.seed(0)
+
+filename = join(dirname(__file__), "template/index.html")
+desc = Div(text=open(filename).read(),
+           render_as_text=False, width=1000)
+
 def clustering(X, algorithm, n_clusters):
     bandwidth = cluster.estimate_bandwidth(X, quantile=0.3)
     if algorithm=='KMeans':
@@ -125,6 +137,12 @@ clusters_slider = Slider(title="Jumlah cluster",
                          end=10.0,
                          step=1,
                          width=400)
+theme_select = Select(title='Tema', options=['dark_minimal',
+                                                'caliber',
+                                                'light_minimal', 
+                                                'night_sky', 
+                                                'contrast'])
+theme_select.on_change('value', switch_theme)
 
 def update_algorithm_or_clusters(attrname, old, new):
     global X
@@ -151,5 +169,7 @@ samples_slider.on_change('value_throttled', update_samples_or_dataset)
 selects = row(dataset_select, algorithm_select)
 input = row (samples_slider, clusters_slider)
 inputs = column(selects, input)
-curdoc().add_root(column(plot,inputs, height=50, sizing_mode="stretch_width"))
+curdoc().add_root(column(theme_select))
+curdoc().add_root(desc)
+curdoc().add_root(column(plot,inputs, height=50))
 curdoc().title = "Visualisasi Clustering"
